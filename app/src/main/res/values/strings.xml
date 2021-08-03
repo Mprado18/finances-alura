@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Finanças</string>
+    <string name="add_revenue">Adicionar receita</string>
+    <string name="add_expense">Adicionar despesa</string>
+</resources>
