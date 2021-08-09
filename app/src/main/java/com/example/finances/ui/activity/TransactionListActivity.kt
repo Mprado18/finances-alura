@@ -1,14 +1,16 @@
 package com.example.finances.ui.activity
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import com.example.finances.R
+import com.example.finances.delegate.TransactionDelegate
 import com.example.finances.model.Transaction
 import com.example.finances.model.Types
+import com.example.finances.ui.ResumeView
 import com.example.finances.ui.adapter.TransactionsListAdapter
+import com.example.finances.ui.dialog.CreateTransactionDialog
 import kotlinx.android.synthetic.main.activity_transaction_list.*
-import java.math.BigDecimal
-import java.util.*
 
 //TODO trocar synthetic por view binding
 //TODO corrigir e otimizar layout da activity
@@ -17,34 +19,52 @@ import java.util.*
 //TODO alterar id e nome de imagens pt para inglês
 
 class TransactionListActivity : AppCompatActivity() {
+
+    private val transactions: MutableList<Transaction> = mutableListOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_transaction_list)
 
-        val transactionsList: List<Transaction> = transactionListExamples()
-
-        createListTransaction(transactionsList)
+        createResumeCardView()
+        createListTransaction()
+        handleFloatingActionButton()
     }
 
-    private fun createListTransaction(transactionsList: List<Transaction>) {
-        transactions_listview.adapter = TransactionsListAdapter(transactionsList, this)
+    private fun handleFloatingActionButton() {
+        lista_transacoes_adiciona_receita.setOnClickListener {
+            renderDialog(Types.REVENUE)
+        }
+
+        lista_transacoes_adiciona_despesa.setOnClickListener {
+            renderDialog(Types.EXPENSE)
+        }
     }
 
-    private fun transactionListExamples(): List<Transaction> = listOf(
-        Transaction(
-            date = Calendar.getInstance(),
-            value = BigDecimal(10),
-            type = Types.EXPENSE
-        ),
-        Transaction(
-            value = BigDecimal(20.5),
-            category = "Comida",
-            type = Types.EXPENSE
-        ),
-        Transaction(
-            type = Types.REVENUE,
-            value = BigDecimal(100),
-            category = "Economia"
-        )
-    )
+    private fun renderDialog(type: Types) {
+        CreateTransactionDialog(window.decorView as ViewGroup, this)
+            .createDialog(type, object : TransactionDelegate {
+                override fun delegate(transaction: Transaction) {
+                    updateTransactions(transaction)
+                    lista_transacoes_adiciona_menu.close(true)
+                }
+
+            })
+    }
+
+    private fun updateTransactions(transaction: Transaction) {
+        transactions.add(transaction)
+        createListTransaction()
+        createResumeCardView()
+    }
+
+    private fun createResumeCardView() {
+        val view = window.decorView
+        val resumeView = ResumeView(this, view, transactions)
+        resumeView.updateResume()
+    }
+
+    private fun createListTransaction() {
+        transactions_listview.adapter = TransactionsListAdapter(transactions, this)
+    }
 }
