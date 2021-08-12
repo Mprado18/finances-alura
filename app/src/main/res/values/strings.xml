@@ -2,4 +2,8 @@
     <string name="app_name">Finanças</string>
     <string name="add_revenue">Adicionar receita</string>
     <string name="add_expense">Adicionar despesa</string>
+    <string name="change_revenue">Alterar receita</string>
+    <string name="change_expense">Alterar despesa</string>
+    <string name="include">Incluir</string>
+    <string name="change">Alterar</string>
 </resources>
